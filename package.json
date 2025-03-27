@@ -12,11 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "cheerio": "^1.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "meilisearch": "^0.49.0",
-    "node-fetch": "^3.3.2",
-    "pg": "^8.14.1"
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2"
   }
 }
