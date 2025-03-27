@@ -6,9 +6,7 @@ const app = express();
 const PORT = 3000;
 
 // Middleware CORS
-app.use(cors({
-	origin: 'https://nexuback.onrender.com'
-}));
+app.use(cors());
 
 app.use(express.json()); // Habilita JSON no Express
 
