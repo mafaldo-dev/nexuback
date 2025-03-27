@@ -1,9 +1,11 @@
 import http from "http";
 import url  from "url"
 import searchAll  from "./engine.js"
+import cors from "cors"
 
-// Porta do servidor
-const PORT = 3000
+app.use(cors({
+	origin: 'https://nexuback.onrender.com'
+}))
 
 // Criar o servidor HTTP
 const server = http.createServer(async (req, res) => {
@@ -74,9 +76,5 @@ const server = http.createServer(async (req, res) => {
   res.end(JSON.stringify({ error: "Rota não encontrada" }))
 })
 
-// Iniciar o servidor
-server.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`)
-  console.log(`Acesse: http://localhost:${PORT}/`)
-})
+
 
