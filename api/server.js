@@ -7,6 +7,8 @@ app.use(cors({
 	origin: 'https://nexuback.onrender.com'
 }))
 
+const PORT = 3000
+
 // Criar o servidor HTTP
 const server = http.createServer(async (req, res) => {
   // Configurar cabeçalhos CORS
@@ -78,3 +80,6 @@ const server = http.createServer(async (req, res) => {
 
 
 
+app.listen(PORT,  () => {
+	console.log('O Servidor esta rodando na porta', PORT)
+})
