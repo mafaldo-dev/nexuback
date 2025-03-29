@@ -30,7 +30,7 @@ const corsOptions = {
   methods: ["GET","POST"],
   allowedHeaders: ["Content-Type", "Autorization"]
 };
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(express.json()); // Habilita JSON no Express
 
