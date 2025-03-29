@@ -11,7 +11,7 @@ const app = express();
 const PORT = 3000;
 
 // Configuração do Redis
-const client = createClient({
+/* const client = createClient({
   url: `redis://:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
 });
 
@@ -24,7 +24,7 @@ client.on("connect", () => {
 client.on("error", (err) => {
   console.error("Erro ao conectar ao Redis:", err);
 });
-
+ */
 // Configuração do CORS
 const corsOptions = {
   origin: "*", // Aceitar todas as origens
