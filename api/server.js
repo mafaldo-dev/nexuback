@@ -27,16 +27,21 @@ client.on("error", (err) => {
 
 const corsOptions = {
   origin: "*",
-  methods: ["GET","POST"],
-  allowedHeaders: ["Content-Type", "Autorization"]
+  methods: ["GET", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 };
 app.use(cors(corsOptions));
 
 app.use(express.json()); // Habilita JSON no Express
 
 // Rota de busca com cache no Redis
-app.get("/api/searchAll", async (req, res) => {
+app.get("/api/searchAll", cors(corsOptions), async (req, res) => {
   const query = req.query.q;
+
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (!query) {
     return res.status(400).json({ error: "É necessário fornecer um termo de busca" });
