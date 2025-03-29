@@ -1,11 +1,13 @@
-import fetch from 'node-fetch';
+import axios from 'axios';
 
-// Função para fazer a requisição com timeout (já está implementada)
-const fetchWithTimeout = (url, timeout = 5000) => {
-  return Promise.race([
-    fetch(url).then(res => res.json()),
-    new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), timeout))
-  ]);
+// Função para fazer a requisição com timeout
+const fetchWithTimeout = async (url, timeout = 5000) => {
+  try {
+    const response = await axios.get(url, { timeout });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message || 'Erro ao fazer a requisição');
+  }
 };
 
 // Função para buscar no Serper.dev
@@ -13,13 +15,9 @@ async function searchSerper(query) {
   try {
     const apiKey = process.env.SERPER_API_KEY;  // Sua chave de API do Serper.dev
     const endpoint = `https://google.serper.dev/search?q=${encodeURIComponent(query)}`;
-    
-    // Requisição para a Serper.dev API
-    const response = await fetchWithTimeout(endpoint, 5000, {
-      headers: {
-        "X-API-KEY": apiKey
-      }
-    });
+
+    // Requisição para a Serper.dev API com timeout usando Axios
+    const response = await fetchWithTimeout(endpoint, 5000);
 
     if (!response || !response.organic_results) {
       console.error("Nenhum resultado encontrado ou resposta mal formatada.");
