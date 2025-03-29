@@ -26,7 +26,7 @@ client.on("error", (err) => {
 });
 
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://nexuearth.vercel.app/", "*"],
+  origin: "*",
   methods: ["GET","POST"],
   allowedHeaders: ["Content-Type", "Autorization"]
 };
