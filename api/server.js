@@ -25,7 +25,11 @@ client.on("error", (err) => {
   console.error("Erro ao conectar ao Redis:", err);
 });
 
-// Middleware CORS
+const corsOptions = {
+  origin: ["http://localhost:3000", "https://nexuearth.vercel.app/", "*"],
+  methods: ["GET","POST"],
+  allowedHeaders: ["Content-Type", "Autorization"]
+};
 app.use(cors());
 
 app.use(express.json()); // Habilita JSON no Express
