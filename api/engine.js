@@ -17,7 +17,12 @@ async function searchSerper(query) {
     const endpoint = `https://google.serper.dev/search?q=${encodeURIComponent(query)}`;
 
     // Requisição para a Serper.dev API com timeout usando Axios
-    const response = await fetchWithTimeout(endpoint, 5000);
+    const response = await fetchWithTimeout(endpoint,{
+      headers: {
+        'X-API-KEY': apiKey,
+        'Content-Type': 'application/json'
+      }
+    },5000);
 
     if (!response || !response.organic_results) {
       console.error("Nenhum resultado encontrado ou resposta mal formatada.");
