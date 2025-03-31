@@ -1,10 +1,8 @@
 const axios = require('axios');
-const dotenv = require('dotenv');
+const apiKey = require('../config');
 
-
-// Função para fazer a requisição com timeout usando axios
 const fetchWithTimeout = (url, timeout = 5000) => {
-  const timeoutInMs = parseInt(timeout, 20);
+  const timeoutInMs = parseInt(timeout, 10);
 
   if (isNaN(timeoutInMs) || timeoutInMs <= 0) {
     throw new Error("O valor do timeout deve ser um número positivo.");
@@ -13,9 +11,9 @@ const fetchWithTimeout = (url, timeout = 5000) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
-      "X-API-KEY": process.env.SERDER_API_KEY,  // Adicionando chave da API no cabeçalho
+      "X-API-KEY": apiKey.SERPER_API_KEY,  
     },
-    timeout: timeoutInMs,  // Timeout em milissegundos
+    timeout: timeoutInMs, 
   };
 
   return axios.get(url, config)
@@ -28,22 +26,17 @@ const fetchWithTimeout = (url, timeout = 5000) => {
     });
 };
 
-// Função para buscar no Serper.dev com axios
+
 async function searchSerper(query) {
   try {
     const endpoint = `https://google.serper.dev/search?q=${encodeURIComponent(query)}`;
 
-    // Requisição para a Serper.dev API com timeout
     const response = await fetchWithTimeout(endpoint, 5000);
-    console.log(response.organic)
-    console.log(dotenv)
-
     if (!response || !response.organic) {
-      console.error("Nenhum resultado encontrado ou resposta mal formatada.");
+      console.error("Nenhum resultado encontrado na Serper.");
       return [];
     }
 
-    // Formatar os resultados
     return response.organic.map(result => ({
       title: result.title || null,
       url: result.link || null,
@@ -56,13 +49,68 @@ async function searchSerper(query) {
   }
 }
 
-// Função para buscar em todas as fontes (agora apenas Serper.dev)
+
+async function searchDuckDuckGo(query) {
+  try {
+    const endpoint = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`;
+    const response = await axios.get(endpoint);
+
+    if (!response.data || !response.data.RelatedTopics) {
+      console.error("Nenhum resultado encontrado no DuckDuckGo.");
+      return [];
+    }
+
+    return response.data.RelatedTopics.map(result => ({
+      title: result.Text || null,
+      url: result.FirstURL || null,
+      snippet: result.Text || null,
+      image: result.Icon ? result.Icon.URL : null
+    }));
+  } catch (error) {
+    console.error("Erro DuckDuckGo:", error);
+    return [];
+  }
+}
+
+const stripHtml = (html) => html.replace(/<[^>]*>?/gm, '');
+
+async function searchWikipedia(query) {
+  try {
+    const endpoint = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json`;
+
+    const response = await axios.get(endpoint);
+
+    if (!response.data.query || !response.data.query.search) {
+      console.error("Nenhum resultado encontrado no Wikipedia.");
+      return [];
+    }
+
+    return response.data.query.search.map(result => ({
+      title: result.title || null,
+      url: `https://en.wikipedia.org/wiki/${encodeURIComponent(result.title)}`,
+      snippet: result.snippet ? stripHtml(result.snippet): null,
+      image: null 
+    }));
+  } catch (error) {
+    console.error("Erro Wikipedia:", error);
+    return [];
+  }
+}
+
 async function searchAll(query) {
   try {
-    const serperResults = await searchSerper(query); // Usando o Serper.dev
-    console.log('Resultados',serperResults)
-    return { query, totalResults: serperResults.length, results: serperResults };
+    const [serperResults, duckDuckGoResults, wikipediaResults] = await Promise.all([
+      searchSerper(query), 
+      searchDuckDuckGo(query),
+      searchWikipedia(query)
+    ]);
 
+    const allResults = [...serperResults, ...duckDuckGoResults, ...wikipediaResults];
+    const uniqueResults = allResults.filter(
+      (result, index, self) => self.findIndex((r) => r.url === result.url) === index
+    );
+
+    return { query, totalResults: uniqueResults.length, results: uniqueResults };
   } catch (error) {
     console.error("Erro na busca:", error);
     return { query, totalResults: 0, results: [] };
