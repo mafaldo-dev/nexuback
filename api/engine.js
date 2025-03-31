@@ -2,8 +2,6 @@ const axios = require('axios');
 const dotenv = require('dotenv');
 
 
-const test = process.env.TEST;  // Sua chave de API do Serper.dev
-
 // Função para fazer a requisição com timeout usando axios
 const fetchWithTimeout = (url, timeout = 5000) => {
   const timeoutInMs = parseInt(timeout, 20);
@@ -15,7 +13,7 @@ const fetchWithTimeout = (url, timeout = 5000) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
-      "X-API-KEY": '2aa7ad0640f183c9f0cf692c0d7c9366b6953cab',  // Adicionando chave da API no cabeçalho
+      "X-API-KEY": process.env.SERDER_API_KEY,  // Adicionando chave da API no cabeçalho
     },
     timeout: timeoutInMs,  // Timeout em milissegundos
   };
@@ -38,7 +36,7 @@ async function searchSerper(query) {
     // Requisição para a Serper.dev API com timeout
     const response = await fetchWithTimeout(endpoint, 5000);
     console.log(response.organic)
-    console.log(test)
+    console.log(dotenv)
 
     if (!response || !response.organic) {
       console.error("Nenhum resultado encontrado ou resposta mal formatada.");
